@@ -9,30 +9,31 @@ on:
 
 jobs:
   build-and-test:
-    # Стратегия: запуск на нескольких ОС
-    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
 
     steps:
       # 1. Клонируем репозиторий
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 2. Устанавливаем Python
+      # 2. Настраиваем Python 3.11
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
 
-      # 3. Устанавливаем зависимости
+      # 3. Устанавливаем зависимости кроссплатформенно
       - name: Install dependencies
+        shell: bash
         run: |
           python -m pip install --upgrade pip
-          if exist requirements.txt (pip install -r requirements.txt)
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
       # 4. Запускаем тесты
       - name: Run unit tests
+        shell: bash
         run: |
           python -m unittest discover -s tests -p "test_*.py"
